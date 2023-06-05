@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> Analyzing Phase </title>
+
+    <script>
+        let fdInterval;
+
+        function updateProgress() {
+            console.log("Progress updated");
+            const url = "/progress";
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+
+                    if (data.ports == 1) {
+                        document.getElementById("PORT").src = "/img/loading.gif";
+                    } else if (data.ports == 2) {
+                        document.getElementById("PORT").src = "/img/check.png";
+                    } else if (data.ports == -1) {
+                        document.getElementById("PORT").src = "/img/warning.png";
+                    }
+
+                    if (data.dns == 1) {
+                        document.getElementById("DNS").src = "/img/loading.gif";
+                    } else if (data.dns == 2) {
+                        document.getElementById("DNS").src = "/img/check.png";
+                    } else if (data.dns == 3) {
+                        document.getElementById("DNS").src = "/img/cross.png";
+                    } else if (data.dns == -1) {
+                        document.getElementById("DNS").src = "/img/warning.png";
+                    }
+
+                    if (data.ftp == 1) {
+                        document.getElementById("FTP").src = "/img/loading.gif";
+                    } else if (data.ftp == 2) {
+                        document.getElementById("FTP").src = "/img/check.png";
+                    } else if (data.ftp == 3) {
+                        document.getElementById("FTP").src = "/img/cross.png";
+                    } else if (data.ftp == -1) {
+                        document.getElementById("FTP").src = "/img/warning.png";
+                    }
+
+                    if (data.samba == 1) {
+                        document.getElementById("SAMBA").src = "/img/loading.gif";
+                    } else if (data.samba == 2) {
+                        document.getElementById("SAMBA").src = "/img/check.png";
+                    } else if (data.samba == 3) {
+                        document.getElementById("SAMBA").src = "/img/cross.png";
+                    } else if (data.samba == -1) {
+                        document.getElementById("SAMBA").src = "/img/warning.png";
+                    }
+
+                    if (data.sql == 1) {
+                        document.getElementById("SQL").src = "/img/loading.gif";
+                    } else if (data.sql == 2) {
+                        document.getElementById("SQL").src = "/img/check.png";
+                    } else if (data.sql == 3) {
+                        document.getElementById("SQL").src = "/img/cross.png";
+                    } else if (data.sql == -1) {
+                        document.getElementById("SQL").src = "/img/warning.png";
+                    }
+
+                    if (data.ssh == 1) {
+                        document.getElementById("SSH").src = "/img/loading.gif";
+                    } else if (data.ssh == 2) {
+                        document.getElementById("SSH").src = "/img/check.png";
+                    } else if (data.ssh == 3) {
+                        document.getElementById("SSH").src = "/img/cross.png";
+                    } else if (data.ssh == -1) {
+                        document.getElementById("SSH").src = "/img/warning.png";
+                    }
+                    
+                    if ((data.ports != 0 && data.ports != 1) && 
+                        (data.dns != 0 && data.dns != 1) &&
+                        (data.ftp != 0 && data.ftp != 1) && 
+                        (data.samba != 0 && data.samba != 1) && 
+                        (data.sql != 0 && data.sql != 1) &&
+                        (data.ssh != 0 && data.ssh != 1)) {
+                        clearInterval(fdInterval);
+                        fetch("/generateJSON");
+                        document.getElementById("bottomForm").style.visibility = "visible";
+                    }
+                });
+        }
+
+        function mainFunction() {
+            fdInterval = setInterval(updateProgress, 1000);
+        }
+        
+    </script>
+
+    <link href="/css/analyzing-styles.css" rel="stylesheet" type="text/css">
+
+</head>
+<body onload="mainFunction()">
+    <%- include("./orbikHeader.ejs") %>
+
+    <div style="text-align: center; padding-top: 30px;">
+        <h1> Analyzing Target </h1>
+        <% if (domain != "") { %>
+            <p> <i> IP: <%= ip %> </i> | <i> Domain: <%= domain %> </i> </p>
+        <% } else { %>
+            <p> <i> IP: <%= ip %> </i> </p>
+        <% } %>
+
+        <table style="margin-left: auto; margin-right: auto; margin-top: 50px;">
+            <tr>
+                <th class="tablaIzquierda">
+                    Port Analysis
+                </th>
+                <th class="tablaDerecha">
+                    <img id="PORT" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
+                </th>
+            </tr>
+            <tr>
+                <th class="tablaIzquierda">
+                    DNS Analysis
+                </th>
+                <th class="tablaDerecha">
+                    <img id="DNS" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
+                </th>
+            </tr>
+            <tr>
+                <th class="tablaIzquierda">
+                    FTP Analysis
+                </th>
+                <th class="tablaDerecha">
+                    <img id="FTP" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
+                </th>
+            </tr>
+            <tr>
+                <th class="tablaIzquierda">
+                    SAMBA Analysis
+                </th>
+                <th class="tablaDerecha">
+                    <img id="SAMBA" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
+                </th>
+            </tr>
+            <tr>
+                <th class="tablaIzquierda">
+                    SQL Analysis
+                </th>
+                <th class="tablaDerecha">
+                    <img id="SQL" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
+                </th>
+            </tr>
+            <tr>
+                <th class="tablaIzquierda">
+                    SSH Analysis
+                </th>
+                <th class="tablaDerecha">
+                    <img id="SSH" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
+                </th>
+            </tr>
+        </table>
+
+        <div id="bottomForm" style="visibility: hidden;">
+            <table style="margin-left: auto; margin-right: auto; margin-top: 50px;">
+                <tr>
+                    <th>
+                        <input type="button" id="buttonSend" value="Download Report" onclick="location.href='/downloadJSON'">
+                    </th>
+                    <th>
+                        <form method="POST" action="/details">
+                            <input type="submit" id="buttonSend" value="Detailed View">
+                        </form>
+                    </th>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

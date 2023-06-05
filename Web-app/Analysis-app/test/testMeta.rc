@@ -1,0 +1,5 @@
+use auxiliary/scanner/mysql/mysql_version
+set RHOSTS 192.168.48.130
+exploit
+
+exit

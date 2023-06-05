@@ -1,0 +1,81 @@
+table {
+    border-collapse: collapse;
+}
+
+.tablaIzquierda {
+padding-right: 40px;
+text-align: right;
+border: none;
+border-right: 6px solid black;
+}
+
+.tablaDerecha {
+padding-left: 40px;
+text-align: left;
+border: none;
+border-left: 6px solid black;
+}
+
+th, td {
+width:150px;
+padding:15px     
+}
+
+body {
+    background-color: rgb(241, 237, 50);
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+}
+
+#buttonSend {
+    background-color: #000000; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+}
+#buttonSend:hover {
+    background-color: #ffffff; /* Green */
+    border: none;
+    color: black;
+    padding: 20px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    font-style: italic;
+    font-weight: bold;
+}
+
+#formTextField, #timestampField {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #f2f2f2;
+    color: #333;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+  }
+  
+  #formTextField:focus {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.672);
+    outline: none;
+  }
+
+  #formTextField:hover {
+    background-color: #000;
+    color: #fff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }

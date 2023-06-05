@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> Menu </title>
+
+    <script>
+        let fdInterval = 0;
+
+        
+
+        function mainFunction() { document.getElementById("timestampField").value = Date(); }
+    </script>
+
+    <link href="/css/analyzing-styles.css" rel="stylesheet" type="text/css">
+
+</head>
+<body onload="mainFunction()">
+    <%- include("./orbikHeader.ejs") %>
+
+    <div style="text-align: center; padding-top: 30px;">
+
+    <h1> Target Info </h1>
+
+        <form method="POST" action="/ping">
+                
+            <table style="margin-left: auto; margin-right: auto; margin-top: 50px;">
+                <tr>
+                    <th class="tablaIzquierda">
+                        Target IP
+                    </th>
+                    <th class="tablaDerecha">
+                        <input type="text" id ="formTextField" name="ip">
+                    </th>
+                </tr>
+                <tr>
+                    <th class="tablaIzquierda">
+                        Domain
+                    </th>
+                    <th class="tablaDerecha">
+                        <input type="text" id ="formTextField" name="domain">
+                    </th>
+                </tr>
+            </table>
+
+            <table style="margin-left: auto; margin-right: auto; margin-top: 75px;">
+                <tr>
+                    <th class="tablaIzquierda">
+                        Company Name
+                    </th>
+                    <th class="tablaDerecha">
+                        <input type="text" id ="formTextField" name="companyName">
+                    </th>
+                </tr>
+                <tr>
+                    <th class="tablaIzquierda">
+                        Notes
+                    </th>
+                    <th class="tablaDerecha">
+                        <input type="text" id ="formTextField" name="notes">
+                    </th>
+                </tr>
+                <tr>
+                    <th class="tablaIzquierda">
+                        Test Timestamp
+                    </th>
+                    <th class="tablaDerecha">
+                        <input type="text" id ="timestampField" readonly>
+                    </th>
+                </tr>
+            </table>
+
+            <table style="margin-left: auto; margin-right: auto; margin-top: 50px;">
+                <tr>
+                    <th>
+                        <input type="submit" id="buttonSend" value="Analyze Target">
+                    </th>
+                </tr>
+            </table>
+        </form>
+    </div>
+</body>
+
+</html>

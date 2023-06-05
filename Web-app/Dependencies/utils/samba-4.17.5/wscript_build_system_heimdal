@@ -1,0 +1,4 @@
+from waflib import Logs
+
+Logs.info("\tSelected system Heimdal build")
+bld.RECURSE('third_party/heimdal_build')

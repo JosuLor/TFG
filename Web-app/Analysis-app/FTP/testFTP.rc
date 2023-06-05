@@ -1,0 +1,9 @@
+use auxiliary/scanner/ftp/ftp_version
+set RHOSTS _IP_TARGET_
+exploit
+
+use auxiliary/scanner/ftp/anonymous
+set RHOSTS _IP_TARGET_
+exploit
+
+exit

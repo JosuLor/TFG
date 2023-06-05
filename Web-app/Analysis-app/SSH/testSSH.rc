@@ -1,0 +1,5 @@
+use auxiliary/scanner/ssh/ssh_version
+set RHOSTS _IP_TARGET_
+exploit
+
+exit

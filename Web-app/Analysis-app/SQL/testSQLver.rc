@@ -1,0 +1,5 @@
+use auxiliary/scanner/mysql/mysql_version
+set RHOSTS _IP_TARGET_
+exploit
+
+exit
