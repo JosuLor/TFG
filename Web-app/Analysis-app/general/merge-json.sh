@@ -20,6 +20,6 @@ json_dns=$(cat DNS/enumedDNS.json);
 if [ "$json_dns" == "" ]; then json_dns="{}"; fi
 
 json_string='{ "IP": "'$1'", "Domain": "'$2'", "company": "'$company'", "description": "'$description'", "timestamp": "'$timestamp'", "version": "'$version'",
-"ssh": '$json_ssh', "samba": '$json_samba', "ftp": '$json_ftp', "sql": '$json_sql' }'
+"ssh": '$json_ssh', "samba": '$json_samba', "ftp": '$json_ftp', "sql": '$json_sql', "dns": '$json_dns' }'
 
 echo $json_string > "${filename}"
