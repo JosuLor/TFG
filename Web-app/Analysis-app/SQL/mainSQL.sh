@@ -129,11 +129,36 @@ dbs_json="${dbs_json%??}"; dbs_json="$dbs_json ] "
 echo -e "\nTablas totales: $n_tablas\n"
 purple_color; echo -e " > Toda la información de los esquemas guardada en JSON"; default_color
 
+nmap -p 3306 --script=mysql-info $IP > temp/out-sql-info.txt
+nmapRes_sqlinfo=$(cat temp/out-sql-info.txt)
+
+capabilitiesFlags=$(echo "$nmapRes_sqlinfo" | grep "Capabilities flags:" | cut -d ":" -f2)
+echo "Capabilities flags: $capabilitiesFlags"
+status=$(echo "$nmapRes_sqlinfo" | grep "Status:" | cut -d ":" -f2)
+echo "Status: $status"
+sal=$(echo "$nmapRes_sqlinfo" | grep "Salt:" | cut -d ":" -f2)
+echo "Salt: $sal"
+
+somecapabilities=$(echo "$nmapRes_sqlinfo" | grep "Some Capabilities:" | cut -d ":" -f2)
+echo "Some Capabilities: $somecapabilities"
+IFSoriginal=$IFS
+IFS=","
+for cap in $somecapabilities; do
+    echo " > Capability: $cap"
+done
+IFS=$IFSoriginal
+
+capabilitiesJSON=" [  "
+for cap in $somecapabilities; do capabilitiesJSON="$capabilitiesJSON \"$cap\", "; done
+capabilitiesJSON="${capabilitiesJSON%??}"; capabilitiesJSON="$capabilitiesJSON ] "
+
 # crear JSON final con los resultados del protocolo
 filename="enumedSQL.json"
 PROT="SQL"
 
-json_string='{ "protocolo": "'$PROT'", "version": "'$version'", "credentials": '$credenciales_json', "db_scheme": '$dbs_json' }'
+json_string='{ "protocolo": "'$PROT'", "version": "'$version'", 
+"capabilities_flags": "'$capabilitiesFlags'", "capabilities": '$capabilitiesJSON', "status": "'$status'",
+"credentials": '$credenciales_json', "db_scheme": '$dbs_json' }'
 
 echo $json_string > "${filename}"
 
