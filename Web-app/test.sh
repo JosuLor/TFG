@@ -1,1 +1,0 @@
-./Analysis-app/SAMBA/mainSAMBA.sh 192.168.48.130
