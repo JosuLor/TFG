@@ -74,4 +74,4 @@ EXPOSE 3000
 
 WORKDIR /webapp
 # Define el comando que se ejecutará cuando el contenedor se inicie
-CMD ["npm", "start"]
+#CMD ["npm", "start"]

@@ -16,6 +16,11 @@ let progressJson;
 let currentIP;
 let currentDomain;
 
+let ssh = false;
+let ftp = false;
+let samba = false;
+let sql = false;
+
 app.get("/", (req, res) => {
     /*
     scriptProcess = spawn('bash', [appPath+"DNS/mainDNS.sh", "ikasten.io"]);
@@ -70,11 +75,6 @@ app.post("/analyze", (req, res) => {
 
     res.render("analyzing.ejs", {ip: currentIP, domain: currentDomain})
 
-    let ssh = false;
-    let ftp = false;
-    let samba = false;
-    let sql = false;
-
     console.log("nmap execution started")
     progressJson.ports = 1;
     const scriptProcess = spawn('bash', [appPath+"/general/nmap-start.sh", currentIP]);
@@ -83,62 +83,7 @@ app.post("/analyze", (req, res) => {
         console.log("Nmap execution ended");
         if (code == 0) progressJson.ports = 2; else progressJson.ports = -1;
     
-        if (currentDomain != "" && currentDomain != null) {
-            progressJson.dns = 1;
-            const dnsProcess = spawn('bash', ['./Analysis-app/DNS/mainDNS.sh', currentDomain]);
-            dnsProcess.on('close', (dnsCode) => {
-                console.log("CODE dns: ", dnsCode)
-                console.log("DNS execution ended");
-                if (dnsCode == 0) progressJson.dns = 2; else progressJson.dns = -1;
-            });
-
-            dnsProcess.stdout.on('data', (data) => {
-                const output = data.toString().toLowerCase();
-                console.log(data.toString());
-            });
-        } else {
-            progressJson.dns = 3;
-        }
-
-        if (ssh) {
-            progressJson.ssh = 1;
-            const sshProcess = spawn('bash', ['./Analysis-app/SSH/mainSSH.sh', currentIP]);
-            sshProcess.on('close', (sshCode) => {
-                console.log("CODE ssh: ", sshCode)
-                console.log("SSH execution ended");
-                if (sshCode == 0) progressJson.ssh = 2; else progressJson.ssh = -1;
-            });
-        }
-
-        if (ftp) {
-            progressJson.ftp = 1;
-            const ftpProcess = spawn('bash', ['./Analysis-app/FTP/mainFTP.sh', currentIP]);
-            ftpProcess.on('close', (ftpCode) => {
-                console.log("CODE ftp: ", ftpCode)
-                console.log("FTP execution ended");
-                if (ftpCode == 0) progressJson.ftp = 2; else progressJson.ftp = -1;
-            });
-        }
-
-        if (samba) {
-            progressJson.samba = 1;
-            const sambaProcess = spawn('bash', ['./Analysis-app/SAMBA/mainSAMBA.sh', currentIP]);
-            sambaProcess.on('close', (sambaCode) => {
-                console.log("CODE samba: ", sambaCode)
-                console.log("SAMBA execution ended");
-                if (sambaCode == 0) progressJson.samba = 2; else progressJson.samba = -1;
-            });
-        }
-
-        if (sql) {
-            progressJson.sql = 1;
-            const sqlProcess = spawn('bash', ['./Analysis-app/SQL/mainSQL.sh', currentIP]);
-            sqlProcess.on('close', (sqlCode) => {
-                console.log("CODE sql: ", sqlCode)
-                console.log("SQL execution ended");
-                if (sqlCode == 0) progressJson.sql = 2; else progressJson.sql = -1;
-            });
-        }
+        dispatcher(1);
     });
 
     scriptProcess.stdout.on('data', (data) => {
@@ -150,6 +95,97 @@ app.post("/analyze", (req, res) => {
         if (output.includes("sql")) { sql = true; } else { progressJson.sql = 3; }
     });
   });
+
+function dispatcher (protocolID) {
+    console.log("Llamada a dispatcher")
+
+    switch (protocolID) {
+        case 1:
+            console.log("Llamada a dispatcher 1")
+            if (currentDomain != "" && currentDomain != null) {
+                progressJson.dns = 1;
+                const dnsProcess = spawn('bash', ['./Analysis-app/DNS/mainDNS.sh', currentDomain]);
+                dnsProcess.on('close', (dnsCode) => {
+                    console.log("CODE dns: ", dnsCode)
+                    console.log("DNS execution ended");
+                    if (dnsCode == 0) progressJson.dns = 2; else progressJson.dns = -1;
+                    dispatcher(2);
+                });
+                
+                dnsProcess.stdout.on('data', (data) => {
+                    const output = data.toString().toLowerCase();
+                    console.log(data.toString());
+                });
+            } else {
+                progressJson.dns = 3;
+                dispatcher(2);
+            }
+            break;
+        case 2:
+            console.log("Llamada a dispatcher 2")
+            if (ssh) {
+                progressJson.ssh = 1;
+                const sshProcess = spawn('bash', ['./Analysis-app/SSH/mainSSH.sh', currentIP]);
+                sshProcess.on('close', (sshCode) => {
+                    console.log("CODE ssh: ", sshCode)
+                    console.log("SSH execution ended");
+                    if (sshCode == 0) progressJson.ssh = 2; else progressJson.ssh = -1;
+                    dispatcher(3);
+                });
+            } else {
+                dispatcher(3);
+            }
+            break;
+        case 3:
+            console.log("Llamada a dispatcher 3")
+            if (ftp) {
+                progressJson.ftp = 1;
+                const ftpProcess = spawn('bash', ['./Analysis-app/FTP/mainFTP.sh', currentIP]);
+                ftpProcess.on('close', (ftpCode) => {
+                    console.log("CODE ftp: ", ftpCode)
+                    console.log("FTP execution ended");
+                    if (ftpCode == 0) progressJson.ftp = 2; else progressJson.ftp = -1;
+                    dispatcher(4);
+                });
+            } else {
+                dispatcher(4);
+            }
+            break;
+        case 4:
+            console.log("Llamada a dispatcher 4")
+            if (samba) {
+                progressJson.samba = 1;
+                const sambaProcess = spawn('bash', ['./Analysis-app/SAMBA/mainSAMBA.sh', currentIP]);
+                sambaProcess.on('close', (sambaCode) => {
+                    console.log("CODE samba: ", sambaCode)
+                    console.log("SAMBA execution ended");
+                    if (sambaCode == 0) progressJson.samba = 2; else progressJson.samba = -1;
+                    dispatcher(5);
+                });
+            } else {
+                dispatcher(5);
+            }
+            break;
+        case 5:
+            console.log("Llamada a dispatcher 5")
+            if (sql) {
+                progressJson.sql = 1;
+                const sqlProcess = spawn('bash', ['./Analysis-app/SQL/mainSQL.sh', currentIP]);
+                sqlProcess.on('close', (sqlCode) => {
+                    console.log("CODE sql: ", sqlCode)
+                    console.log("SQL execution ended");
+                    if (sqlCode == 0) progressJson.sql = 2; else progressJson.sql = -1;
+                    dispatcher(6);
+                });
+            } else {
+                dispatcher(6);
+            }
+            break;
+        default:
+            console.log("Llamada a dispatcher default")
+            break;
+    }
+}
 
 app.get("/downloadJSON", (req, res) => {
 

@@ -305,7 +305,7 @@ else
     fi
 fi
 
-smbclient \\\\192.168.48.130\\tmp -U% > temp/anonymousLoginRES.txt -c "help; exit"
+smbclient \\\\$1\\tmp -U% > temp/anonymousLoginRES.txt -c "help; exit"
 anonymousLoginRES=$(cat "temp/anonymousLoginRES.txt")
 anonymousLoginREScont=$(echo "$anonymousLoginRES" | wc -w)
 anonymousJSON=" [  "
