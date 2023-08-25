@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> <%= protocol %> - Select Options </title>
+
+    <link href="/css/index-styles.css" rel="stylesheet" type="text/css">
+    
+    <script>
+
+        function mainFunction() {
+            console.log("<%= protocol %>");
+            if ("<%= protocol %>" == "DOMAIN") {
+                document.getElementById("formDOMAIN").style.visibility = "visible";
+                document.getElementById("formFTP").style.visibility = "hidden";
+                document.getElementById("formSQL").style.visibility = "hidden";
+                document.getElementById("formSSH").style.visibility = "hidden";
+                document.getElementById("formSAMBA").style.visibility = "hidden";
+
+                document.getElementById("formDOMAIN").style.display = "flex";
+                document.getElementById("formFTP").style.display = "none";
+                document.getElementById("formSQL").style.display = "none";
+                document.getElementById("formSSH").style.display = "none";
+                document.getElementById("formSAMBA").style.display = "none";
+            } else if ("<%= protocol %>" == "FTP") {
+                document.getElementById("formDOMAIN").style.visibility = "hidden";
+                document.getElementById("formFTP").style.visibility = "visible";
+                document.getElementById("formSQL").style.visibility = "hidden";
+                document.getElementById("formSSH").style.visibility = "hidden";
+                document.getElementById("formSAMBA").style.visibility = "hidden";
+
+                document.getElementById("formDOMAIN").style.display = "none";
+                document.getElementById("formFTP").style.display = "visible";
+                document.getElementById("formSQL").style.display = "none";
+                document.getElementById("formSSH").style.display = "none";
+                document.getElementById("formSAMBA").style.display = "none";
+            } else if ("<%= protocol %>" == "SQL") {
+                document.getElementById("formDOMAIN").style.visibility = "hidden";
+                document.getElementById("formFTP").style.visibility = "hidden";
+                document.getElementById("formSQL").style.visibility = "visible";
+                document.getElementById("formSSH").style.visibility = "hidden";
+                document.getElementById("formSAMBA").style.visibility = "hidden";
+
+                document.getElementById("formDOMAIN").style.display = "none";
+                document.getElementById("formFTP").style.display = "none";
+                document.getElementById("formSQL").style.display = "flex";
+                document.getElementById("formSSH").style.display = "none";
+                document.getElementById("formSAMBA").style.display = "none";
+            } else if ("<%= protocol %>" == "SSH") {
+                document.getElementById("formDOMAIN").style.visibility = "hidden";
+                document.getElementById("formFTP").style.visibility = "hidden";
+                document.getElementById("formSQL").style.visibility = "hidden";
+                document.getElementById("formSSH").style.visibility = "visible";
+                document.getElementById("formSAMBA").style.visibility = "hidden";
+
+                document.getElementById("formDOMAIN").style.display = "none";
+                document.getElementById("formFTP").style.display = "none";
+                document.getElementById("formSQL").style.display = "none";
+                document.getElementById("formSSH").style.display = "flex";
+                document.getElementById("formSAMBA").style.display = "none";
+            } else if ("<%= protocol %>" == "SAMBA") {
+                document.getElementById("formDOMAIN").style.visibility = "hidden";
+                document.getElementById("formFTP").style.visibility = "hidden";
+                document.getElementById("formSQL").style.visibility = "hidden";
+                document.getElementById("formSSH").style.visibility = "hidden";
+                document.getElementById("formSAMBA").style.visibility = "visible";
+
+                document.getElementById("formDOMAIN").style.display = "none";
+                document.getElementById("formFTP").style.display = "none";
+                document.getElementById("formSQL").style.display = "none";
+                document.getElementById("formSSH").style.display = "none";
+                document.getElementById("formSAMBA").style.display = "flex";
+            }
+        }
+    </script>
+</head>
+<body onload="mainFunction()">
+    <%- include("./orbikHeader.ejs") %>
+
+    <h2 style="text-align: left; margin-left: 100px; " class="titulo-con-icono"> <%= protocol %> Options &nbsp;</h2>
+    <i><h3 style="text-align: left; margin-left: 100px; margin-top: -10px;" id="currenturl"> Please, select the desired analyis options </h3></i>
+
+    <div style="margin-left: 5%; margin-top: 50px;" id="formDOMAIN">
+        <form method="POST" action="/sendOptions">
+            <input type="text" name="protocol" value="<%=protocol%>" style="display: none; visibility: hidden;">
+            <tr>
+                <% if (selection.dns.basic == "on") { %>
+                    <input type="checkbox" name="basic" checked> Basic Analysis <br>
+                <% } else { %>
+                    <input type="checkbox" name="basic"> Basic Analysis <br>
+                <% } %>
+            </tr>
+            <br>
+            <tr>
+                <% if (selection.dns.xss_url == "") { %>
+                    <input type="radio" name="option_xss" value="url"> XSS for individual URL &nbsp; &nbsp;
+                <% } else { %>
+                    <input type="radio" name="option_xss" value="url" checked> XSS for individual URL &nbsp; &nbsp;
+                <% } %>
+                <input type="text" name="xss_url_text" value="<%= selection.dns.xss_url %>">
+            </tr>
+            <br>
+            <tr>
+                <% if (selection.dns.xss_domain == "") { %>
+                    <input type="radio" name="option_xss" value="domain"> XSS for entire domain &nbsp; &nbsp;
+                <% } else { %>
+                    <input type="radio" name="option_xss" value="domain" checked> XSS for entire domain &nbsp; &nbsp;
+                <% } %>
+                <input type="text" name="xss_domain_text" value="<%= selection.dns.xss_domain %>">
+            </tr>
+            <tr>
+                <br><br>
+                <input type="submit" id="buttonSend" value="Confirm"> &nbsp; &nbsp;
+                <input type="button" id="buttonCancel" value="Cancel" onclick="window.location.href='/analyze'">
+            </tr>
+        </form>
+    </div>
+
+    <div style="margin-left: 5%; margin-top: 50px;" id="formFTP">
+        <form method="POST" action="/sendOptions" >
+            <input type="text" name="protocol" value="<%= protocol %>" style="display: none; visibility: hidden;">
+            <tr>
+                <% if (selection.ftp.basic == "on") { %>
+                    <input type="checkbox" name="basic" checked> Basic Analysis <br>
+                <% } else { %>
+                    <input type="checkbox" name="basic"> Basic Analysis <br>
+                <% } %>
+            </tr>
+            <br>
+            <tr>
+                <input type="submit" id="buttonSend" value="Confirm"> &nbsp; &nbsp;
+                <input type="button" id="buttonCancel" value="Cancel" onclick="window.location.href='/analyze'">
+            </tr>
+        </form>
+    </div>
+
+    <div style="margin-left: 5%; margin-top: 50px;" id="formSQL">
+        <form method="POST" action="/sendOptions" >
+            <input type="text" name="protocol" value="<%= protocol %>" style="display: none; visibility: hidden;">
+            <tr>
+                <% if (selection.sql.basic == "on") { %>
+                    <input type="checkbox" name="basic" checked> Basic Analysis <br>
+                <% } else { %>
+                    <input type="checkbox" name="basic"> Basic Analysis <br>
+                <% } %>
+            </tr>
+            <br>
+            <tr>
+                <input type="submit" id="buttonSend" value="Confirm"> &nbsp; &nbsp;
+                <input type="button" id="buttonCancel" value="Cancel" onclick="window.location.href='/analyze'">
+            </tr>
+        </form>
+    </div>
+
+    <div style="margin-left: 5%; margin-top: 50px;" id="formSSH">
+        <form method="POST" action="/sendOptions" >
+            <input type="text" name="protocol" value="<%= protocol %>" style="display: none; visibility: hidden;">
+            <tr>
+                <% if (selection.ssh.basic == "on") { %>
+                    <input type="checkbox" name="basic" checked> Basic Analysis <br>
+                <% } else { %>
+                    <input type="checkbox" name="basic"> Basic Analysis <br>
+                <% } %>
+            </tr>
+            <br>
+            <tr>
+                <input type="submit" id="buttonSend" value="Confirm"> &nbsp; &nbsp;
+                <input type="button" id="buttonCancel" value="Cancel" onclick="window.location.href='/analyze'">
+            </tr>
+        </form>
+    </div>
+
+    <div style="margin-left: 5%; margin-top: 50px;" id="formSAMBA">
+        <form method="POST" action="/sendOptions" >
+            <input type="text" name="protocol" value="<%= protocol %>" style="display: none; visibility: hidden;">
+            <tr>
+                <% if (selection.samba.basic == "on") { %>
+                    <input type="checkbox" name="basic" checked> Basic Analysis <br>
+                <% } else { %>
+                    <input type="checkbox" name="basic"> Basic Analysis <br>
+                <% } %>
+            </tr>
+            <br>
+            <tr>
+                <input type="submit" id="buttonSend" value="Confirm"> &nbsp; &nbsp;
+                <input type="button" id="buttonCancel" value="Cancel" onclick="window.location.href='/analyze'">
+            </tr>
+        </form>
+    </div>
+</body>
+
+</html>

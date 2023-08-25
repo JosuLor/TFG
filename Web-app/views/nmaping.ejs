@@ -2,22 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title> Menu </title>
+    <title> Nmap - Service & Port Detection </title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <script>
         let fdInterval = 0;
 
-        function pingProgress() {
+        function nmapProgress() {
             
-            fetch("/pingProgress").then(response => response.json()).then(data => {
+            fetch("/nmapProgress").then(response => response.json()).then(data => {
                 console.log(data);
-                if (data.ping == 2 || data.ping == -1) {
+
+                if (data.status == 2 || data.status == 1) {
                     clearInterval(fdInterval);
-                    if (data.ping == -1) {
-                        document.getElementById("pingResult").innerHTML = " No connection to target or unstable connection";
+                    if (data.status == 2) {
+                        document.getElementById("pingResult").innerHTML = " Failed to detect ports & services ";
                         document.getElementById("pingResultSubtext").innerHTML = " Please check your connection to the target and try again ";
                         fdInterval = setInterval(gotoMenu, 3000);
-                    } else if (data.ping == 2) {
+                    } else if (data.status == 1) {
                         document.getElementById("pingResult").innerHTML = " Stable connection to target ";
                         fdInterval = setInterval(gotoAnalyze, 4000);
                     }
@@ -25,14 +26,11 @@
             });
         }
 
-        function dos() {
-            console.log("pingProgress");
-        }
 
         function gotoAnalyze() { document.getElementById("formAnalyze").submit(); }
         function gotoMenu() { window.location.href = "/"; }
 
-        function mainFunction() { dos(); fdInterval = setInterval(pingProgress, 1000) }
+        function mainFunction() { fdInterval = setInterval(nmapProgress, 1000) }
     </script>
 
     <link href="/css/analyzing-styles.css" rel="stylesheet" type="text/css">
@@ -42,14 +40,14 @@
     <%- include("./orbikHeader.ejs") %>
 
 <div style="text-align: center; padding-top: 75px;">
-    <h1> Connecting to target <%= ip %> </h1>
+    <h1> Detecting ports & services of <%= ip %> </h1>
     
     <img id="progressBar" style="padding-top: 35px;" src="/img/loadingbar.gif" alt="Cargando...">
     
     <i><h3 id="pingResult"></h3></i>
     <i><h3 style="color: red; font-size: 20px;" id="pingResultSubtext"></h3></i>
 
-    <form method="POST" action="/nmap" id="formAnalyze"> <input type="submit" style="visibility: hidden;"> </form>
+    <form method="POST" action="/analyze" id="formAnalyze"> <input type="submit" style="visibility: hidden;"> </form>
 </div>
 
 </body>

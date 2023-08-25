@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> XSS Analyzer - Domain </title>
+
+    <link href="/css/index-styles.css" rel="stylesheet" type="text/css">
+    
+    <script>
+        let fdInterval;
+        let totalUrls = 0;
+        
+
+        function updateURLs() {
+            const url = "/getDomain";
+            
+            document.getElementById("domainurls").src = "/img/loading.gif";
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.urls != -1) {
+                        totalUrls = data.urls;
+                        document.getElementById("numberofurls").innerHTML = data.urls + " proper <%= domain %> domain URLs found";
+                        document.getElementById("domainurls").src = "/img/check.png";
+                        document.getElementById("individualurls").src = "/img/loading.gif";
+                        document.getElementById("individualtext").innerHTML = " (0%, 0/" + totalUrls + ") ";
+                        clearInterval(fdInterval);
+                        fetch("/startURLvuln");
+                        setInterval(updateIndividualURLs, 200);
+                    }
+                });
+        }
+
+        function updateIndividualURLs() {
+            const url = "/getIndividualURL";
+                
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+
+                    if (data.END == 1) {
+                        document.getElementById("currenturl").innerHTML = "All URLs analyzed";
+                        document.getElementById("fieldDescriptor").innerHTML = "&nbsp;";
+                        document.getElementById("individualurls").src = "/img/check.png";
+
+                        document.getElementById("cuadro1").style.display = "none"
+                        document.getElementById("cuadro1").style.visibility = "hidden";
+
+                        document.getElementById("cuadro2").style.display = "none"
+                        document.getElementById("cuadro2").style.visibility = "hidden";
+
+                        clearInterval(fdInterval);
+                        return;
+                    }
+
+                    clearData();
+                    
+                    document.getElementById("currenturl").innerHTML = data.url;
+                    document.getElementById("cuadro1").style.display = "flex"
+                    document.getElementById("cuadro1").style.visibility = "visible";
+                    
+                    if (data.hasForms == 0) {
+                        document.getElementById("formMethod").innerHTML = "No forms found; skipping to the next URL...";
+                        document.getElementById("cuadro2").style.display = "none"
+                        document.getElementById("cuadro2").style.visibility = "hidden";
+                    } else {
+                        document.getElementById("formNumber").innerHTML = "&nbsp; Form " + data.formNumber + " ";
+                        document.getElementById("formMethod").innerHTML = "&nbsp; | Method: " + data.method + " ";
+                        if (data.action == data.url) {
+                            document.getElementById("formAction").innerHTML = "&nbsp; | Action: self (url) ";
+                        } else {
+                            document.getElementById("formAction").innerHTML = "&nbsp; | Action: " + data.action + " ";
+                        }
+
+                        document.getElementById("formFieldnumber").innerHTML = "&nbsp; | Fields: " + data.formFieldNumber + " ";
+
+                        if (data.formField == "") {
+                            document.getElementById("")
+                        } else {
+                            document.getElementById("fieldDescriptor").innerHTML = data.formField;
+                            document.getElementById("cuadro2").style.display = "flex"
+                            document.getElementById("cuadro2").style.visibility = "visible";
+                            document.getElementById("fieldRes").innerHTML = data.hasXSS;
+                        }
+                    }
+                    
+                    //console.log("Form Field: " + data.formField);
+                    console.log(data)
+            });
+
+            fetch("getProgressPercentage")
+                .then(response => response.json())
+                .then(data => { 
+                    document.getElementById("individualtext").innerHTML = " (" + ((data.current / totalUrls) * 100).toFixed() + "%, " + data.current + "/" + totalUrls + ") ";
+            });
+                
+        }
+            
+        function clearData() {
+            document.getElementById("currenturl").innerHTML = "";
+            document.getElementById("fieldDescriptor").innerHTML = "-/-";
+
+            document.getElementById("formNumber").innerHTML = "";
+            document.getElementById("formMethod").innerHTML = "";
+            document.getElementById("formFieldnumber").innerHTML = "";
+            document.getElementById("formAction").innerHTML = "";
+
+            document.getElementById("cuadro1").style.display = "none";    
+            document.getElementById("cuadro1").style.visibility = "hidden";
+
+            document.getElementById("fieldDescriptor").innerHTML = "&nbsp;";
+            document.getElementById("fieldRes").innerHTML = "&nbsp;";
+        }
+
+        function mainFunction() {
+
+            document.getElementById("cuadro1").style.display = "none"
+            document.getElementById("cuadro1").style.visibility = "hidden";
+
+            document.getElementById("cuadro2").style.display = "none"
+            document.getElementById("cuadro2").style.visibility = "hidden";
+
+            fetch("/startFullDomain"); 
+            fdInterval = setInterval(updateURLs, 50)
+        }
+
+    </script>
+</head>
+<body onload="mainFunction()">
+    <%- include("./orbikHeader.ejs") %>
+
+    <h2 style="text-align: left; margin-left: 100px; margin-top: 70px;" class="titulo-con-icono"> Domain URL enumeration &nbsp; &nbsp;</h2><img class="titulo-con-icono" id="domainurls" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando..."> </h2> 
+    <h3 style="text-align: left; margin-left: 100px; color: green; margin-top: -10px;" id="numberofurls">&nbsp;</h3>
+    <h2 class="titulo-con-icono2"> <%= domain %> </h2>
+    <h2 style="text-align: left; margin-left: 100px; " class="titulo-con-icono"> Individual URL analysis &nbsp;</h2> <h2 id="individualtext" class="titulo-con-icono">(0%, 0/0)</h2></h2> &nbsp; <img class="titulo-con-icono" id="individualurls" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
+    <i><h3 style="text-align: left; margin-left: 100px; color: green; margin-top: -10px;" id="currenturl">&nbsp; </h3></i>
+
+    <br>
+    <div class="cuadro" id="cuadro1">
+        <h3 style="color: green;" id="formNumber">&nbsp; X </h3><h3 style="color: white" id="formMethod"> metodo </h3><h3 id="formFieldnumber">fieldnumber</h3><h3 style="color:white" id="formAction"> action </h3>
+    </div>
+    <div class="cuadro2" id="cuadro2">
+        <table style="text-align: center; margin: auto; white-space: nowrap;">
+            <tr>
+                <th>
+                    <h3> Field under analysis </h3>
+                    <p id="fieldDescriptor">&nbsp; -/- </p>
+                </th>
+                <th>
+                    <h3> Analysis result </h3>
+                    <p id="fieldRes">&nbsp; </p>
+                </th>
+            </tr>
+        </table>
+        <br>
+    </div>
+
+</body>
+
+</html>

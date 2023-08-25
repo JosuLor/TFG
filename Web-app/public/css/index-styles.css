@@ -34,6 +34,30 @@ body {
     font-weight: bold;
 }
 
+#buttonCancel {
+  background-color: #990000; /* Green */
+  border: none;
+  color: rgb(0, 0, 0);
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: bold;
+}
+#buttonCancel:hover {
+  background-color: #ffffff; /* Green */
+  border: none;
+  color: #990000;
+  padding: 20px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: bold;
+}
+
 #formTextField, #timestampField {
     padding: 10px;
     border: none;
@@ -85,3 +109,38 @@ body {
     border-left: 6px solid rgb(0, 0, 0);
     height: 475px;
   }  
+
+  .titulo-con-icono, .icono {
+    display: inline-block;
+    margin-top: 0px;
+  }
+  
+  .titulo-con-icono2, .icono2 {
+    margin-left: 80%;
+    font-size: 30px;
+  }
+
+  .cuadro {
+    background-color: black;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    text-align: left;
+    margin-left: 15%;
+    width: 70%;
+  }
+
+  .cuadro2 {
+    background-color: black;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin-left: 25%;
+    margin-top: 20px;
+    width: 50%;
+  }

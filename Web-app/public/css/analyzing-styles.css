@@ -57,6 +57,42 @@ body {
     font-weight: bold;
 }
 
+#buttonCancel {
+  background-color: #990000; /* Green */
+  border: none;
+  color: rgb(0, 0, 0);
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: bold;
+}
+#buttonCancel:hover {
+  background-color: #ffffff; /* Green */
+  border: none;
+  color: #990000;
+  padding: 20px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: bold;
+}
+
+#buttonProtocol {
+  background-color: #00000000; /* Green */
+  border: none;
+  color: rgb(34, 34, 34);
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  font-weight: bold;
+}
+
 #formTextField, #timestampField {
     padding: 10px;
     border: none;

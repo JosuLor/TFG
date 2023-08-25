@@ -130,11 +130,11 @@ for ((j=0; j<$cuantosforms; j++)); do
         param="${fieldname}=XSS"
 #        echo -en " > Testing form field: $param";
         if [ "$method" == "GET" ] || [ "$method" == "get" ]; then
-            #xsser -u $url?$param > xsserout.txt
-            ./xsser -u $url?$param > xsserout.txt
+            xsser -u $url?$param > xsserout.txt
+            #./xsser -u $url?$param > xsserout.txt
         else
-            #xsser -u $url -p $param > xsserout.txt    
-            ./xsser -u $url -p $param > xsserout.txt
+            xsser -u $url -p $param > xsserout.txt
+            #./xsser -u $url -p $param > xsserout.txt
         fi
         res=$(cat xsserout.txt)
         rm -f xsserout.txt

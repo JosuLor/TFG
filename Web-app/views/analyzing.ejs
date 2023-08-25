@@ -83,11 +83,18 @@
                         clearInterval(fdInterval);
                         fetch("/generateJSON");
                         document.getElementById("bottomForm").style.visibility = "visible";
+                        document.getElementById("bottomForm").style.display = "flex";
                     }
                 });
         }
 
         function mainFunction() {
+
+            if ( "<%= discovered.samba %>" == "3" ) { document.getElementById("tablaSAMBA").innerHTML = ""; }
+            if ( "<%= discovered.ftp %>" == "3" ) { document.getElementById("tablaFTP").innerHTML = ""; }
+            if ( "<%= discovered.ssh %>" == "3" ) { document.getElementById("tablaSSH").innerHTML = ""; }
+            if ( "<%= discovered.sql %>" == "3" ) { document.getElementById("tablaSQL").innerHTML = ""; }
+
             fdInterval = setInterval(updateProgress, 1000);
         }
         
@@ -98,59 +105,55 @@
 </head>
 <body onload="mainFunction()">
     <%- include("./orbikHeader.ejs") %>
-
+    
     <div style="text-align: center; padding-top: 30px;">
         <h1> Analyzing Target </h1>
-        <% if (domain != "") { %>
-            <p> <i> IP: <%= ip %> </i> | <i> Domain: <%= domain %> </i> </p>
-        <% } else { %>
-            <p> <i> IP: <%= ip %> </i> </p>
-        <% } %>
+        <p> <i> IP: <%= ip %> </i> </p>
 
         <table style="margin-left: auto; margin-right: auto; margin-top: 50px;">
             <tr>
                 <th class="tablaIzquierda">
-                    Port Analysis
+                    <form method="POST" action="/options"> <input type="button" name="button" value="Port Analysis" id="buttonProtocol"> <input type="text" name="prot" style="visibility: hidden; display: none;" value="PORT"> </form>
                 </th>
                 <th class="tablaDerecha">
-                    <img id="PORT" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
+                    <img id="PORT" style="width: 35px; height: 35px;" src="/img/check.png" alt="Cargando...">
                 </th>
             </tr>
             <tr>
                 <th class="tablaIzquierda">
-                    DNS Analysis
+                    <form method="POST" action="/options"> <input type="submit" name="button" value="Domain Analysis" id="buttonProtocol"> <input type="text" name="prot" style="visibility: hidden; display: none;" value="DOMAIN"> </form>
                 </th>
                 <th class="tablaDerecha">
                     <img id="DNS" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
                 </th>
             </tr>
-            <tr>
+            <tr id="tablaFTP">
                 <th class="tablaIzquierda">
-                    FTP Analysis
+                    <form method="POST" action="/options"> <input type="submit" name="button" value="FTP Analysis" id="buttonProtocol"> <input type="text" name="prot" style="visibility: hidden; display: none;" value="FTP"> </form>
                 </th>
                 <th class="tablaDerecha">
                     <img id="FTP" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
                 </th>
             </tr>
-            <tr>
+            <tr id="tablaSAMBA">
                 <th class="tablaIzquierda">
-                    SAMBA Analysis
+                    <form method="POST" action="/options"> <input type="submit" name="button" value="SAMBA Analysis" id="buttonProtocol"> <input type="text" name="prot" style="visibility: hidden; display: none;" value="SAMBA"> </form>
                 </th>
                 <th class="tablaDerecha">
                     <img id="SAMBA" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
                 </th>
             </tr>
-            <tr>
+            <tr id="tablaSQL">
                 <th class="tablaIzquierda">
-                    SQL Analysis
+                    <form method="POST" action="/options"> <input type="submit" name="button" value="SQL Analysis" id="buttonProtocol"> <input type="text" name="prot" style="visibility: hidden; display: none;" value="SQL"> </form>
                 </th>
                 <th class="tablaDerecha">
                     <img id="SQL" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
                 </th>
             </tr>
-            <tr>
+            <tr id="tablaSSH">
                 <th class="tablaIzquierda">
-                    SSH Analysis
+                    <form method="POST" action="/options"> <input type="submit" name="button" value="SSH Analysis" id="buttonProtocol"> <input type="text" name="prot" style="visibility: hidden; display: none;" value="SSH"> </form>
                 </th>
                 <th class="tablaDerecha">
                     <img id="SSH" style="width: 35px; height: 35px;" src="/img/time.png" alt="Cargando...">
@@ -158,16 +161,28 @@
             </tr>
         </table>
 
-        <div id="bottomForm" style="visibility: hidden;">
+        <div id="bottomForm" style="visibility: hidden; display: none;">
             <table style="margin-left: auto; margin-right: auto; margin-top: 50px;">
                 <tr>
                     <th>
                         <input type="button" id="buttonSend" value="Download Report" onclick="location.href='/downloadJSON'">
                     </th>
                     <th>
-                        <form method="POST" action="/details">
-                            <input type="submit" id="buttonSend" value="Detailed View">
+                        <form method="POST" action="/">
+                            <input type="submit" id="buttonSend" value="Do Another">
                         </form>
+                    </th>
+                </tr>
+            </table>
+        </div>
+        <div id="startForm">
+            <table style="margin-left: auto; margin-right: auto; margin-top: 50px;">
+                <tr>
+                    <th>
+                        <input type="button" id="buttonSend" value="Start" onclick="location.href='/startAnalysis'">
+                    </th>
+                    <th>
+                        <input type="button" id="buttonSend" value="Cancel" onclick="location.href='/'">
                     </th>
                 </tr>
             </table>
