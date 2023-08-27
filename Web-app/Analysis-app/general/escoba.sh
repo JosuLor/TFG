@@ -2,6 +2,7 @@
 
 cd ./Analysis-app/
 
+rm -f general/global.json
 rm -f SSH/enumedSSH.json
 rm -f SAMBA/enumedSamba.json
 rm -f FTP/enumedFTP.json
