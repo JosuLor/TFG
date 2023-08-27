@@ -82,7 +82,11 @@
 
     <div style="margin-left: 5%; margin-top: 50px;" id="formDOMAIN">
         <form method="POST" action="/sendOptions">
-            <input type="text" name="protocol" value="<%=protocol%>" style="display: none; visibility: hidden;">
+            <tr>
+                Domain Target &nbsp; &nbsp; <input type="text" name="dns_domain" value="<%= selection.dns.dns_domain %>">
+                <input type="text" name="protocol" value="<%=protocol%>" style="display: none; visibility: hidden;">
+            </tr>
+            <br><br>
             <tr>
                 <% if (selection.dns.basic == "on") { %>
                     <input type="checkbox" name="basic" checked> Basic Analysis <br>
@@ -93,20 +97,19 @@
             <br>
             <tr>
                 <% if (selection.dns.xss_url == "") { %>
-                    <input type="radio" name="option_xss" value="url"> XSS for individual URL &nbsp; &nbsp;
+                    <input type="checkbox" name="option_xss_url"> XSS for individual URL &nbsp; &nbsp;
                 <% } else { %>
-                    <input type="radio" name="option_xss" value="url" checked> XSS for individual URL &nbsp; &nbsp;
+                    <input type="checkbox" name="option_xss_url" checked> XSS for individual URL &nbsp; &nbsp;
                 <% } %>
                 <input type="text" name="xss_url_text" value="<%= selection.dns.xss_url %>">
             </tr>
             <br>
             <tr>
-                <% if (selection.dns.xss_domain == "") { %>
-                    <input type="radio" name="option_xss" value="domain"> XSS for entire domain &nbsp; &nbsp;
+                <% if (selection.dns.option_xss_domain == "off") { %>
+                    <input type="checkbox" name="option_xss_domain"> XSS for entire domain &nbsp; &nbsp;
                 <% } else { %>
-                    <input type="radio" name="option_xss" value="domain" checked> XSS for entire domain &nbsp; &nbsp;
+                    <input type="checkbox" name="option_xss_domain" checked> XSS for entire domain &nbsp; &nbsp;
                 <% } %>
-                <input type="text" name="xss_domain_text" value="<%= selection.dns.xss_domain %>">
             </tr>
             <tr>
                 <br><br>
