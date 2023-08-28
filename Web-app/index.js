@@ -1,3 +1,4 @@
+// Configuracion del servidor web: importar modulos, configurar el servidor, definir rutas, etc.
 const express = require("express");
 const app = express();
 const path = require("path")
@@ -6,23 +7,33 @@ const { spawn } = require('child_process');
 const bodyParser = require("body-parser");
 const appPath="./Analysis-app/"
 
+// Configuracion del servidor: motor de plantillas, directorio de vistas, directorio de archivos estaticos, etc.
 app.set('view engine', 'ejs');
 app.set('views', './views');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Variables globales
 let progressJson;   // 0: No iniciado; 1: En progreso; 2: Finalizado (correctamente); -2: No hay; -1: Finalizado (con error)
 let nmapJson;
-//let selectionJson;  // 0: No seleccionado; 1: seleccionado || "": No seleccionado; "string": seleccionado
-let selectionJson = 0;// = { "dns": { "basic": "on", "xss_url": "", "xss_domain": "" }, "ssh": { "basic": "on" }, "ftp": { "basic": "on" }, "samba": { "basic": "on" }, "sql": { "basic": "on" } }
+let selectionJson = 0;
 let currentIP = "Get out of China";
-let currentDomain = "";
 
+let currentURL = "";// = "https://brutelogic.com.br/gym.php";
+let currentURL_JSON = "";
+let domainJSON = { "urls": -1 };
+let contURL = 0;
+let lineas;
+let devuelta = 0;
+let backup_progressJson;
+
+let currentDomain = "";
 let ssh = false;
 let ftp = false;
 let samba = false;
 let sql = false;
 
+// mostrar pagina principal y limpiar archivos intermedios
 app.get("/", (req, res) => {
 
     progressJson = ""; nmapJson = ""; selectionJson = "";
@@ -38,10 +49,12 @@ app.get("/", (req, res) => {
     res.render("index.ejs")
 })
 
+// enviar progresion a la pagina de ping
 app.get("/pingProgress", (req, res) => {
     res.send(progressJson)
 });
 
+// mostrar pagina de ping y lanzar script de ping
 app.post("/ping", (req, res) => {
     currentIP = req.body.ip;
     res.render("pinging.ejs", {ip: req.body.ip})
@@ -59,6 +72,7 @@ app.post("/ping", (req, res) => {
     });
 });
 
+// mostrar pagina de nmap y lanzar script de nmap; dependiendo de los resultados, se lanzaran ciertos scripts de los protocolos mas adelante
 app.post("/nmap", (req, res) => {
     devuelta = 0;
     nmapJson = { "status": 0 }
@@ -85,10 +99,12 @@ app.post("/nmap", (req, res) => {
 
 });
 
+// enviar JSON de progresion a la pagina de nmap
 app.get("/nmapProgress", (req, res) => {
     res.send(nmapJson)
 });
 
+// generar json final juntando todos los jsons de los protocolos
 app.get("/generateJSON", (req, res) => {
     console.log("JSON generation started")
     
@@ -100,10 +116,12 @@ app.get("/generateJSON", (req, res) => {
     })
 });
 
+// enviar JSON de progresion a la pagina de analisis general
 app.get("/progress", (req, res) => {
     res.send(progressJson)
 });
 
+// mostrar pagina de analisis general
 app.post("/analyze", (req, res) => {
     selectionJson = { "dns": { "basic": "on", "xss_url": "", "xss_domain": "" }, "ssh": { "basic": "on" }, "ftp": { "basic": "on" }, "samba": { "basic": "on" }, "sql": { "basic": "on" } }
     res.render("analyzing.ejs", {ip: currentIP, discovered: progressJson, devuelta: devuelta})
@@ -113,6 +131,7 @@ app.get("/analyze", (req, res) => {
     res.render("analyzing.ejs", {ip: currentIP, discovered: progressJson, devuelta: devuelta})
 });
 
+// repartidor de scripts y tareas dependiendo de las necesidades
 function dispatcher (protocolID) {
     console.log("Llamada a dispatcher: " + JSON.stringify(selectionJson))
 
@@ -238,6 +257,7 @@ function dispatcher (protocolID) {
     }
 }
 
+// cambiar ejs a renderizar desde el servidor hacia el cliente
 app.post("/changeRender", (req, res) => {
     let targetEJS = req.body.ejsToRender;
     
@@ -260,15 +280,7 @@ app.post("/changeRender", (req, res) => {
     }
 });
 
-app.get("/start_xss_URL", (req, res) => {
-    console.log("ASDASDASDASDSD")
-    res.render("individualXSS.ejs", { url: "ikasten.io" });
-});
-
-app.get("/start_xss_DOMAIN", (req, res) => {
-    res.render("domainXSS.ejs", { domain: "ikasten.io" });
-});
-
+// crear y descargar JSON y borrar archivos intermedios
 app.get("/downloadJSON", (req, res) => {
 
     const jsonProcess = spawn('bash', ['./Analysis-app/general/escoba.sh']);
@@ -282,13 +294,15 @@ app.get("/downloadJSON", (req, res) => {
     res.download(file);
 });
 
+// mostrar opciones de analisis disponibles
 app.post("/options", (req, res) => {
     let prot = req.body.prot;
     res.render("options.ejs", {protocol: prot, selection: selectionJson})
 });
 
+// tratar opciones de analisis seleccionadas
 app.post("/sendOptions", (req, res) => {
-    //console.log("BASIC:" + JSON.stringify(req.body))
+    
     switch (req.body.protocol) {
         case "DOMAIN":
             if (req.body.dns_domain != "") {
@@ -355,55 +369,24 @@ app.post("/sendOptions", (req, res) => {
             console.log("ERROR: Protocolo no reconocido:" + req.body.protocol)
             break;
     }
-    //console.log("Selection: " + JSON.stringify(selectionJson));
 
     res.render("analyzing.ejs", { ip: currentIP, discovered: progressJson, devuelta: devuelta })
+});
+
+// direcciones intermedias para analisis de xss
+app.get("/start_xss_URL", (req, res) => {
+    console.log("ASDASDASDASDSD")
+    res.render("individualXSS.ejs", { url: "ikasten.io" });
+});
+
+app.get("/start_xss_DOMAIN", (req, res) => {
+    res.render("domainXSS.ejs", { domain: "ikasten.io" });
 });
 
 app.get("/startAnalysis", (req, res) => {
     dispatcher(0);
     devuelta = 1;
     res.redirect("/analyze");
-    //res.render("analyzing.ejs", { ip: currentIP, discovered: progressJson, devuelta: devuelta })
-});
-
-
-let currentURL = "https://brutelogic.com.br/gym.php";
-let currentURL_JSON = "";
-let domain = "ikasten.io";
-let domainJSON = { "urls": -1 };
-let contURL = 0;
-let lineas;
-let devuelta = 0;
-let backup_progressJson;
-app.get("/debug", (req, res) => {
-    //progressJson = { "ports": 0, "dns": 0, "ssh": 0, "ftp": 0, "samba": 0, "sql": 0 }
-    //devuelta = 1;
-    //prot = "DOMAIN"
-    //progressJson = { "ports": 0, "dns": 0, "ssh": 0, "ftp": 0, "samba": 0, "sql": 0 }
-    //selectionJson = { "dns": { "basic": true, "dns_domain": "", "xss_url": "asdf" }, "ssh": { "basic": true }, "ftp": { "basic": true }, "samba": { "basic": true }, "sql": { "basic": true } }
-
-    //res.render("options.ejs", {protocol: prot, selection: selectionJson})
-
-    //res.render("analyzing.ejs", {ip: currentIP, discovered: progressJson, devuelta: devuelta})
-    
-    //const xssProcess = spawn('bash', ['./Analysis-app/DNS/analyzer/launcher.sh', currentURL]);
-
-    //res.redirect("/start_xss_DOMAIN");
-
-    //fs.unlink("./Analysis-app/DNS/analyzer/temp-vulns.json", (err) => {});
-    //const scriptProcess = spawn('bash', ["./Analysis-app/DNS/analyzer/clean-temp.sh"]);
-    //currentURL_JSON = "";
-    //res.render("individualXSS.ejs", { url: currentURL });
-
-    //ip="192.168.48.128"
-    //devuelta = 0; 
-    //nmapJson = { "status": 0 }
-    //selectionJson = { "dns": { "basic": "off", "xss_url": "", "xss_domain": "" }, "ssh": { "basic": "off" }, "ftp": { "basic": "off" }, "samba": { "basic": "on" }, "sql": { "basic": "off" } }
-    
-    progressJson = { "ports": 0, "dns": 0, "ssh": 0, "ftp": 0, "samba": 0, "sql": 0, "end": 0 }
-    selectionJson = { "dns": { "basic": "off", "xss_url": "", "xss_domain": "" }, "ssh": { "basic": "off" }, "ftp": { "basic": "off" }, "samba": { "basic": "off" }, "sql": { "basic": "off" } }
-    res.render("analyzing.ejs", {ip: currentIP, discovered: progressJson, devuelta: devuelta})
 });
 
 app.get("/startIndividualURL", (req, res) => {
@@ -412,7 +395,6 @@ app.get("/startIndividualURL", (req, res) => {
 });
 
 app.get("/getIndividualURL", (req, res) => {
-    //console.log(currentURL_JSON)
     res.send( currentURL_JSON );
 });
 
@@ -447,34 +429,38 @@ function analyzeOneURL(url) {
     });
 }
 
+// direccion intermedia para devolver a la pagina de analisis
 app.get("/endVuln", (req, res) => {
     devuelta = 1;
     console.log(progressJson)
     res.render("analyzing.ejs", {ip: currentIP, discovered: progressJson, devuelta: devuelta})
 });
 
+// conseuir urls de dominio entero
 app.get("/startFullDomain", (req, res) => {
     const scriptProcess = spawn('bash', ["./Analysis-app/DNS/analyzer/test.sh", selectionJson.dns.dns_domain]);
 
     scriptProcess.stdout.on('data', (data) => {
         var txt = data.toString();
-        //console.log("URLs: " + txt);
         domainJSON.urls = txt;
     });
     
     res.send("");
 });
 
+// enviar cuantas urls se han encontrado
 app.get("/getDomain", (req, res) => {
     res.send(domainJSON);
 });
 
+// lanzar analisis de xss de dominio entero
 app.get("/startURLvuln", (req, res) => {
     domainJSON = { "urls": -1 };
     analyzeDomain();
     res.send("");
 });
 
+// funciones para lanzar scripts de analisis de xss
 function analyzeDomain() {
     contURL = 0;
 
@@ -530,8 +516,8 @@ function analyzeIndividualURL(url) {
     
     scriptProcess.on('close', (code) => {
         analyzeAllDomain();
-        //console.log("EXIT INDIVIDUAL: ", url)
     });
 }
 
+// lanzar el servidor web
 app.listen(3000, function() {console.log("Servidor lanzando en el puerto 3000")});

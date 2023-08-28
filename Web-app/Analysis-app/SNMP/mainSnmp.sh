@@ -1,1 +1,0 @@
-snmpwalk -v2c -c public 192.168.48.134 SNMPv2-MIB::sysDescr.0

@@ -20,10 +20,12 @@ yellow_color() { echo -en "\e[33m\e[1m"; }
 blue_color() { echo -en "\e[34m\e[1m"; }
 default_color() { echo -en "\e[39m\e[0m"; }
 
+# Limpiar archivos temporales
 rm -f globalactions.txt
 touch globalactions.txt
 rm -f temp-vulns.json
 
+# Enumerar URLs del dominio web, guardarlas en un fichero y contarlas para outputearlo al proceso de Javascript en el servidor
 DOM=$1
 echo https://$DOM | hakrawler > out-hakrawler.txt
 cat out-hakrawler.txt | grep "$DOM" > inter-out-sorted-https.txt;
@@ -35,16 +37,3 @@ if [ $# -eq 1 ]; then
 fi
 
 exit $lengthHTTPS
-
-#if [ "$MODE" == "s" ]; then
-#    echo " > Silent mode: " $DOM
-#    echo https://$DOM | maingau > out-gau.txt
-#    cat out-gau.txt | grep $DOM > out-sorted.txt
-#elif [ "$MODE" == "a" ]; then
-#    echo " > Aggressive mode: " $DOM
-#    echo https://$DOM | hakrawler > out-hakrawler.txt
-#    cat out-hakrawler.txt | grep $DOM > out-sorted.txt
-#    rm out-hakrawler.txt
-#    nHref=$(cat out-sorted.txt | grep -c "\[href\]")
-#    nScript=$(cat out-sorted.txt | grep -c "\[script\]")
-#fi
