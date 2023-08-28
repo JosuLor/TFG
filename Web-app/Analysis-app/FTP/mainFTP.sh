@@ -7,18 +7,21 @@ red_color() { echo -en "\e[31m\e[1m"; }
 purple_color() { echo -en "\e[35m\e[1m"; }
 default_color() { echo -en "\e[39m\e[0m"; }
 
+# Variables y configuraciones locales
 IP=$1
 pathMsfconsole=/opt/metasploit/msfconsole
 rm -rf temp; mkdir temp
 
+# Crear fichero de comandos de Metasploit temporal con la configuración de la máquina objetivo
 sed 's/_IP_TARGET_/'$IP'/g' testFTP.rc > temp/temp_testFTP.rc
 
+# Ejecutar Metasploit con el fichero de comandos temporal 
 echo -e "\n[] PROBANDO EXISTENCIA DE SERVICIOS FTP...\n"
 $pathMsfconsole -q -r "temp/temp_testFTP.rc" > "temp/out.txt" 2> /dev/null
 var=$(cat "temp/out.txt")
 
+# Comprobar existencia de FTP
 version=$(echo -e "$var" | grep "FTP Banner" | cut -d "-" -f2)
-
 if [ $(echo "$version" | wc -l) -eq 0 ]; then
     red_color; echo -en " > La máquina objetivo $IP no tiene servicios FTP.\n"; default_color
     exit 1
@@ -27,11 +30,10 @@ else
     version="${version%?}"
 fi
 
+# Probar existencia del modo anonimo
 echo -e "\n\n[] PROBANDO MODO ANÓNIMO...\n"
-
 isAnonymousEnabled=$(echo -e "$var" | grep "Anonymous FTP login not allowed" | wc -w)
 if [ $isAnonymousEnabled -eq 0 ]; then isAnonymousEnabled="true"; else isAnonymousEnabled="false"; fi
-
 
 anonUsers=$(echo -e "$var" | grep "Anonymous user account discovered:")
 f_anonUsers=""
@@ -43,6 +45,7 @@ done
 anonRead=$(echo -e "$var" | grep -i "anonymous.*read.*enabled")
 anonWrite=$(echo -e "$var" | grep -i "anonymous.*write.*enabled")
 
+# Crear JSON de este protocolo
 json_anonRead=" [  "
 isAnonymousRead=$(echo -e "$var" | grep "Anonymous READ" | wc -w)
 if [ $isAnonymousRead -ne 0 ]; then json_anonRead="$json_anonRead \"_GENERAL\", "; fi
@@ -59,13 +62,11 @@ for user in $anonWrite; do
 done
 json_anonWrite="${json_anonWrite%??}"; json_anonWrite="$json_anonWrite ]"
 
-#if [ $anonRead -eq 0 ]; then anonRead="false"; else anonRead="true"; fi
-#if [ $anonWrite -eq 0 ]; then anonWrite="false"; else anonWrite="true"; fi
-
+# Probar vulnerabilidad del bounce
 isBouncable=$(nmap -sV -p 21 --script=ftp-bounce $IP | grep "bounce working!" | wc -w)
 if [ $isBouncable -eq 0 ]; then isBouncable="false"; else isBouncable="true"; fi
 
-# crear JSON final con los resultados del protocolo
+# Desde aqui, crear JSON final con los resultados del protocolo
 filename="enumedFTP.json"
 PROT="FTP"
 

@@ -7,9 +7,11 @@ red_color() { echo -en "\e[31m\e[1m"; }
 purple_color() { echo -en "\e[35m\e[1m"; }
 default_color() { echo -en "\e[39m\e[0m"; }
 
+# Variables y configuraciones locales
 host=$1
 rm -rf temp; mkdir temp
 
+# Comprobar conexion con el dominio
 echo -e "\n[] PROBANDO CONEXION CON EL DOMINIO $host\n\n"
 ping -c 3 $host > temp/ping-out.txt 2> /dev/null
 pingRES=$(cat "temp/ping-out.txt")
@@ -25,6 +27,7 @@ else
     green_color; echo -en " > Host alcanzado (·|· en línea ·|·): $host\n\n"; default_color
 fi
 
+# Obtener y detectar IP asociada al dominio
 nslookupRES=$(nslookup $host | awk '/Address/ {if (++count == 2) print}' | cut -d " " -f 2-)
 if [ "$nslookupRES" == "" ]; then
     red_color; echo -e " > No se han encontrado direcciones IP asociadas al dominio $host\n"; default_color
@@ -32,11 +35,13 @@ else
     green_color; echo -e " > Dirección IP asociada al dominio $host: $nslookupRES\n"; default_color
 fi
 
+# Enumeracion de servicios DNS mediante DNSenum
 echo -e "[] ENUMERACION Y DESCUBRIMIENTO DNS\n"
 dnsenum $host --enum -f ../wordlists/dns-wordlist.txt -noreverse > temp/dnsenum-out.txt 2> /dev/null
 dnsinfo=$(cat "temp/dnsenum-out.txt")
 dnsinfolength=$(echo -e "$dnsinfo" | wc -l)
 
+# Conseguir lineas de inicio y fin de cada seccion para parsear
 lineNameservers=$(echo -e "$dnsinfo" | grep -x "Name Servers:" -n | cut -d ":" -f1 | head -1)
 lineMailservers=$(echo -e "$dnsinfo" | grep -x "Mail (MX) Servers:" -n | cut -d ":" -f1 | head -1)
 lineZonetransfers=$(echo -e "$dnsinfo" | grep -x "Trying Zone Transfers and getting Bind Versions:" -n | cut -d ":" -f1 | head -1)

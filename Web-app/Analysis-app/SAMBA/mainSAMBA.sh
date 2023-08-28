@@ -9,21 +9,21 @@ yellow_color() { echo -en "\e[33m\e[1m"; }
 blue_color() { echo -en "\e[34m\e[1m"; }
 default_color() { echo -en "\e[39m\e[0m"; }
 
+# Variables y configuraciones locales
 IP=$1
-
 pathMsfconsole=/opt/metasploit/msfconsole
 rm -rf temp; mkdir temp
 
+# Crear fichero de comandos de Metasploit temporal con la configuración de la máquina objetivo
 sed 's/_IP_TARGET_/'$IP'/g' testSAMBA.rc > temp/temp_testSAMBA.rc
 
+# Ejecutar Metasploit con el fichero de comandos temporal
 echo -e "\n[] PROBANDO EXISTENCIA DE SERVICIOS SAMBA...\n"
-
 $pathMsfconsole -q -r "temp/temp_testSAMBA.rc" > temp/out.txt 2> /dev/null
-
 var=$(cat "temp/out.txt")
 
+# Comprobar existencia de SAMBA
 version=$(echo -e "$var" | grep "Samba" | cut -d "(" -f2 | cut -d ")" -f1)
-
 if [ $(echo "$version" | wc -l) -eq 0 ]; then
     red_color; echo -n " > La máquina objetivo $IP no tiene servicios Samba.\n"; default_color
     exit 1
@@ -31,11 +31,11 @@ else
     green_color; echo -n " > Servicios Samba encontrados:" $version; default_color 
 fi
 
+# Enumeracion y descubrimiento de recursos compartidos
 listing=$(smbclient -L $IP -U%)
 lineTitle=$(echo "$listing" | grep "Sharename       Type      Comment" -n | cut -d ":" -f1)
 lineTitleServer=$(echo "$listing" | grep "Server               Comment" -n | cut -d ":" -f1)
 lineTitleWorkgroup=$(echo "$listing" | grep "Workgroup            Master" -n | cut -d ":" -f1)
-
 echo -e "\n\n[] ENUMERACION Y DESCUBRIMIENTO SAMBA...\n"
 
 sharenames=""
@@ -48,7 +48,7 @@ sharenamesJSON=""
 contador=1
 acabarBucle=1
 
-# comprobar workshares generales
+# Comprobar Workshares generales
 while [ $acabarBucle -eq 1 ]
 do
     linea=$(echo "$listing" | sed -n "${contador}p")
@@ -71,7 +71,7 @@ else
     sharenames=$(echo "$listing" | sed -n "$((lineTitle)),$((contador-1))"p)
 fi
 
-# crear JSON de sharenames
+# Crear JSON de sharenames
 localCont=1
 sharenamesJSON=" [  "
 
@@ -129,7 +129,7 @@ sharenamesJSON="$sharenamesJSON ] "
 
 acabarBucle=1; contador=$((contador+1))
 
-# comprobar workshares de servidores
+# Comprobar workshares de servidores
 while [ $acabarBucle -eq 1 ]
 do
     linea=$(echo "$listing" | sed -n "${contador}p")
@@ -226,10 +226,8 @@ done
 
 if [ $((contador - lineTitleWorkgroup)) -eq 2 ]; then
     workgroups=""
-    #echo "No hay workgroups\n"
 else
     workgroups=$(echo "$listing" | sed -n "$((lineTitleWorkgroup+1)),$((contador-1))"p)
-    #echo "$workshares"
 fi
 
 # crear JSON de workgroups
@@ -305,6 +303,7 @@ else
     fi
 fi
 
+# Probar acceso anónimo
 smbclient \\\\$1\\tmp -U% > temp/anonymousLoginRES.txt -c "help; exit"
 anonymousLoginRES=$(cat "temp/anonymousLoginRES.txt")
 anonymousLoginREScont=$(echo "$anonymousLoginRES" | wc -w)
@@ -323,6 +322,7 @@ fi
 anonymousJSON="${anonymousJSON%??}"
 anonymousJSON="$anonymousJSON ] "
 
+# Enumeracion de usuarios y dispositivos (impresoras)
 enum4linux -a $IP > temp/enum4linuxRES.txt
 sed -i 's/\\/\//g' temp/enum4linuxRES.txt 
 totalenum="$(cat temp/enum4linuxRES.txt)"

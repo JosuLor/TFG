@@ -7,23 +7,27 @@ red_color() { echo -en "\e[31m\e[1m"; }
 purple_color() { echo -en "\e[35m\e[1m"; }
 default_color() { echo -en "\e[39m\e[0m"; }
 
+# Variables y configuraciones locales
 IP=$1
 pathMsfconsole=/opt/metasploit/msfconsole
 rm -rf temp; mkdir temp
+
 sed 's/_IP_TARGET_/'$IP'/g' testSQL.rc > temp/temp_testSQL.rc
 sed 's/_IP_TARGET_/'$IP'/g' testSQLver.rc > temp/temp_testSQLver.rc
 
 echo -e "\n[] PROBANDO EXISTENCIA DE SERVICIOS SQL...\n"
 version=""
 
+# Se intenta 3 veces encontrar la version de MySQL (por alguna razon, no suele encontrarla a la primera)
 for (( cont=1; cont <=3; cont++)); do
 
+    # Usar Metasploit con el fichero de comandos temporal
     $pathMsfconsole -q -r temp/temp_testSQLver.rc > temp/outver.txt 2> /dev/null
     var=$(cat "temp/outver.txt")
 
+    # Comprobar existencia de servicios SQL (MySQL)
     discRES=$(echo -e "$var" | grep "$IP:3306 is running MySQL" | cut -d "-" -f2 | wc -l)
     version=$(echo -e "$var" | grep "is running MySQL" | awk -F 'is running' '{print $2}')
-
     if [ $discRES -eq 0 ]; then
         red_color; echo -en " > No se ha conseguido encontrar la version de MySQL en $IP.\n"; default_color
     else
@@ -35,16 +39,16 @@ done
 
 echo -e "[] ENUMERACIÓN Y EXPLORACIÓN DE SERVICIOS SQL..."
 
+# Usar Metasploit con el fichero de comandos temporal
 $pathMsfconsole -q -r temp/temp_testSQL.rc > temp/out.txt 2> /dev/null
 var=$(cat "temp/out.txt")
 
+# Conseguir credenciales de usuarios hasheadas
 purple_color; echo -e "\n > Usuario - contraseña hasheada encontrados: \n--------------------------------"; default_color
 userPass=$(echo -e "$var" | grep "Saving HashString as Loot" | awk -F 'Saving HashString as Loot:' '{print $2}')
 echo -e "$userPass"
-#if [ "$userPass" -eq ""]; then
-#    red_color; echo -e " > No se han encontrado.\n"; default
-#fi
 
+# Parsear esquemas encontrados
 n_dbs=$(echo -e "$var" | grep "DBName:" | wc -l)
 db_names=$(echo -e "$var" | grep "DBName:" | cut -d ":" -f2)
 n_tablas=$(echo -e "$var" | grep "TableName:" | wc -l)
@@ -58,8 +62,8 @@ for i in $db_names; do
     db_array+=($i)
 done
 
+# crear JSONs
 userPass_array=($userPass)
-
 credenciales_json=" [  "
 for ((i=0; i<${#userPass_array[@]}; i++)); do
     localUser=$(echo "${userPass_array[i]}" | cut -d ":" -f1)
@@ -115,8 +119,6 @@ for i in "${!db_array[@]}"; do
         localTotalList="${localTotalList%??}"; localTotalList="$localTotalList ] "
         tablas_db_json="$tablas_db_json { \"name\" : \"${tablas_array[tabla]}\", \"content\" : $localTotalList }, "
 
-        #echo -e "============ ${tablas_array[tabla]} ==========\n $localTotalList"
-        #json_string=" { \"name\" : \"${tablas_array[tabla]}\", \"content\" : [ $localList ] }"
     done
 
     if [ "$tablas_db_json" == " [  " ]; then tablas_db_json=" [ ] "; fi
@@ -129,6 +131,7 @@ dbs_json="${dbs_json%??}"; dbs_json="$dbs_json ] "
 echo -e "\nTablas totales: $n_tablas\n"
 purple_color; echo -e " > Toda la información de los esquemas guardada en JSON"; default_color
 
+# Conseguir informacion adicional mediante scripts de nmap
 nmap -p 3306 --script=mysql-info $IP > temp/out-sql-info.txt
 nmapRes_sqlinfo=$(cat temp/out-sql-info.txt)
 
