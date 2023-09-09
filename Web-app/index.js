@@ -104,17 +104,14 @@ app.get("/nmapProgress", (req, res) => {
     res.send(nmapJson)
 });
 
-// generar json final juntando todos los jsons de los protocolos
-app.get("/generateJSON", (req, res) => {
-    console.log("JSON generation started")
+function mergearJSON() {
     
     const jsonProcess = spawn('bash', ['./Analysis-app/general/merge-json.sh', currentIP]);
     jsonProcess.on('close', (jsonCode) => {
         console.log("CODE json: ", jsonCode)
         console.log("JSON execution ended");
-        res.send("")
     })
-});
+}
 
 // enviar JSON de progresion a la pagina de analisis general
 app.get("/progress", (req, res) => {
@@ -157,6 +154,7 @@ function dispatcher (protocolID) {
             } else {
                 console.log("Finalizado")
                 progressJson.end = 1;
+                mergearJSON();
             }
             break;
         case 1:
@@ -283,7 +281,7 @@ app.post("/changeRender", (req, res) => {
 // crear y descargar JSON y borrar archivos intermedios
 app.get("/downloadJSON", (req, res) => {
 
-    const jsonProcess = spawn('bash', ['./Analysis-app/general/escoba.sh']);
+    const jsonProcess = spawn('bash', ['./Analysis-app/general/escoba.sh', "no"]);
     jsonProcess.on('close', (jsonCode) => {
         console.log("CODE escoba: ", jsonCode)
         console.log("Escoba pasada");
@@ -518,6 +516,15 @@ function analyzeIndividualURL(url) {
         analyzeAllDomain();
     });
 }
+
+// direccion intermedia para devolver a la pagina de analisis
+app.get("/debug", (req, res) => {
+    devuelta = 0;
+    currentIP="192.168.48.128";
+    progressJson = { "ports": 0, "dns": 0, "ssh": 0, "ftp": 0, "samba": 0, "sql": 0, "end": 0 }
+    selectionJson = { "dns": { "basic": "off", "xss_url": "", "xss_domain": "" }, "ssh": { "basic": "off" }, "ftp": { "basic": "off" }, "samba": { "basic": "on" }, "sql": { "basic": "off" } }
+    res.render("analyzing.ejs", {ip: currentIP, discovered: progressJson, devuelta: devuelta})
+});
 
 // lanzar el servidor web
 app.listen(3000, function() {console.log("Servidor lanzando en el puerto 3000")});
