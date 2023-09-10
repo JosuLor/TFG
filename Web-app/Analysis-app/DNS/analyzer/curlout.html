@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<head>
+<title>XSS Gym - Train your XSS Muscles</title>
+<noscript>Your browser does not support JavaScript!</noscript>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="XSS Gym - Train your XSS Muscles">
+<meta property="og:url" content="https://brutelogic.com.br/gym.php">
+<meta property="og:type" content="website">
+<meta property="og:description" content="More than 30 different XSS cases to play with, show and share XSS Proofs-of-Concept (PoCs).">
+<meta property="og:image" content="https://brutelogic.com.br/gym.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@brutelogic">
+<meta name="twitter:creator" content="@rodoassis">
+<meta name="twitter:title" content="XSS Gym - Train your XSS Muscles">
+<meta name="twitter:description" content="More than 30 different XSS cases to play with, show and share XSS Proofs-of-Concept (PoCs).">
+<meta name="twitter:image" content="https://brutelogic.com.br/gym.png">
+<link rel="icon" href="favicon.png">
+<style>
+   body {
+     color: white;
+     background-repeat: no-repeat;
+     background-size: 700px 800px;
+     background-color: black;
+     background-position: 10px 0px;
+     background-image: url('https://brutelogic.com.br/blog/wp-content/uploads/2016/03/brute.png');
+   }
+   #k {
+     position: absolute;
+     bottom: 10px;
+     right: 10px;
+     content: url('https://knoxss.me/wp-content/uploads/2021/04/knoxss-glitch.gif');?>');
+   }
+</style>
+<script>
+   function doSomething(arg) { if (arg !== '') console.log("Document loaded with arg as " + arg + ".") }
+</script>
+</head>
+<body onload="doSomething('')">
+<h1 id="h1">XSS Gym</h1>
+<form action="/gym.php" method="POST">
+<input type="hidden" name="p06" value="">
+<input type='hidden' name='p07' value=''>
+Name
+<br>
+<input type="text" name="p08" value="">
+<br><br>
+Email
+<br>
+<input type='text' name='p09' value=''>
+<br><br>
+Message
+<br>
+<textarea rows="4" cols="20"></textarea>
+<br><br>
+<input type="submit">
+</form>
+<script>
+   var p11 = 'value_p11';
+   var p12 = "value_p12";
+   var p13 = 'value_p13';
+   var p14 = "value_p14";
+   var p15 = 'value_p15';
+   var p16 = "value_p16";
+   var p17 = `value_p17`;
+   var p18 = `value_p18`;
+   var p19 = `value_p19`;
+   var p20 = `value_p20`;
+</script>
+<br>
+<script src="/file.js"></script>
+<a href="https://knoxss.me"><div id="k"></div></a>
+<iframe style="display:none" src="/tests/status.html"></iframe>
+<script>var p24_1 = 'value_p24'; var p24_2 = 'value_p24';</script>
+<script>
+   var a = 'Dojo';
+   var b = 'Arena';
+   var c = 'Playground';
+   var cS = document.location.search;
+   var sP = new URLSearchParams(cS);
+   var p25 = sP.get('p25');
+   var p26 = sP.get('p26');
+   var p27 = sP.get('p27');
+   var n = [];
+
+   if (p25 !== null) {
+      document.getElementById('h1').innerHTML = 'XSS ' + p25;
+   }
+
+   if (p26 !== null) {
+      document.location = p26;
+   }
+
+   if (p27 !== null) {
+      eval('n.p=' + p27.toLowerCase());
+      document.getElementById('h1').innerHTML = 'XSS ' + n.p;
+   }
+</script>
+<!-- Comments Section -->
+<!-- Lorem ipsum dolor sit amet -->
+<!-- ================ -->
+<script>
+   var gym = document.getElementById("h1");
+   if (document.location.search.match("p30")) {
+      gym.innerHTML = "";
+   }
+</script>
+<script>var headers = '{"Host":"brutelogic.com.br","X-Forwarded-For":"62.99.112.4","X-Forwarded-Proto":"https","X-Real-IP":"62.99.112.4","X-Sucuri-ClientIP":"62.99.112.4","X-Sucuri-Country":"ES","user-agent":"curl/7.88.1","accept":"*/*"}';</script>
+<footer>
+<p style="font-size:11px">© 2023 Brute Logic - All rights reserved.</p>
+</footer>
+</body>
+</html>

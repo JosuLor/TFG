@@ -262,7 +262,7 @@ app.post("/changeRender", (req, res) => {
     switch (targetEJS) {
         case "individualXSS.ejs":
             let localurl = selectionJson.dns.xss_url;
-            selectionJson.dns.xss_url = "";
+            //selectionJson.dns.xss_url = "";
             progressJson = backup_progressJson;
             res.render("individualXSS.ejs", { url: localurl });
             break;
@@ -398,10 +398,10 @@ app.get("/getIndividualURL", (req, res) => {
 
 function analyzeOneURL(url) {
     const scriptProcess = spawn('bash', ["./Analysis-app/DNS/analyzer/eachAnalyzer.sh", selectionJson.dns.xss_url]);
-    
+    selectionJson.dns.xss_url = "";
     scriptProcess.stdout.on('data', (data) => {
         var txt = data.toString();
-        
+        console.log("CHINA TAIPEI: " + txt)
         currentURL_JSON = txt;
     });
     

@@ -25,8 +25,23 @@ echoar() {
             \"END\": 0 }" >&1
 }
 
-globalactions=$(cat globalactions.txt)
+globalactions=""
+
+if [ -e "globalactions.txt" ]; then
+    globalactions=$(cat globalactions.txt)
+fi
+
 url=$1
+
+# Conseguir codigo fuente HTML de la pagina web
+./curlear.sh $url
+var=$(cat curlout.html);
+
+# Comprobar si la url contiene formularios
+cuantosforms=$(echo -e "$var" | grep -o "<form" | wc -l)
+lineasform_START=$(echo -e "$var" | grep -n "<form" | cut -d: -f1); lineasform_START=($lineasform_START)
+lineasform_END=$(echo -e "$var" | grep -n "</form" | cut -d: -f1);  lineasform_END=($lineasform_END)
+forms=""
 
 # Variables locales para outputearlo al proceso de Javascript en el servidor
 currentURL="$url" 
@@ -38,16 +53,6 @@ currentFormFieldNumber=-1   # cuantos fields tiene el formulario
 currentFormField=""         # nombre del field actualmente siendo analizado
 currentIsAlready=0          # accion ya analizada (efecto blog) | 0 = not already analyzed; 1 = already analyzed
 currentHasXSS=""            # "" = no xss; != "" -> el payload
-
-# Conseguir codigo fuente HTML de la pagina web
-curl -s -L -o curlout.html $url
-var=$(cat curlout.html);
-
-# Comprobar si la url contiene formularios
-cuantosforms=$(echo -e "$var" | grep -o "<form" | wc -l)
-lineasform_START=$(echo -e "$var" | grep -n "<form" | cut -d: -f1); lineasform_START=($lineasform_START)
-lineasform_END=$(echo -e "$var" | grep -n "</form" | cut -d: -f1);  lineasform_END=($lineasform_END)
-forms=""
 
 if [ $cuantosforms -eq 0 ]; then
     currentHasForms=0
@@ -119,14 +124,12 @@ for ((j=0; j<$cuantosforms; j++)); do
 
         # Ejecutar xsser, dependiendo del método del formulario (get/post)
         if [ "$method" == "GET" ] || [ "$method" == "get" ]; then
-            #xsser -u $url?$param > xsserout.txt
-            ./xsser -u $url?$param > xsserout.txt
+            res=$(./xsser -u $url -g $param)
+            #./xsser -u $url?$param > xsserout.txt
         else
-            #xsser -u $url -p $param > xsserout.txt
-            ./xsser -u $url -p $param > xsserout.txt
+            res=$(./xsser -u $url -p $param)
+            #./xsser -u $url -p $param > xsserout.txt
         fi
-        res=$(cat xsserout.txt)
-        rm -f xsserout.txt
 
         # Comprobar si se ha encontrado XSS
         if [ $(echo -e "$res" | grep "Successful: 1" | wc -l) -eq 0 ]; then

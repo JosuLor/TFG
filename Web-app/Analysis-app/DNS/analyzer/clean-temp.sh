@@ -6,6 +6,6 @@ fi
 
 # Limiar archivos temporales
 rm -f globalactions.txt
-rm -f curlout.html
-rm -f xsserout.txt
+#rm -f curlout.html
+#rm -f xsserout.txt
 rm -f out-sorted-https.txt
